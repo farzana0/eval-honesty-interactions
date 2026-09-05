@@ -28,10 +28,29 @@ import json
 from pathlib import Path
 
 import numpy as np
-
 import yaml
 
 from paths import PROJECT_ROOT, resolve_paths, assert_writable
+
+# First-token refusal markers, each tokenised with and without a leading space.
+# Broad rather than exhaustive: these cover the common refusal openings
+# ("I can't...", "Sorry, ...", "Unfortunately ..."), which are what would
+# contaminate v_honest. harvest_2x2.py imports refusal_token_ids from here so
+# the mass it records and the gate below cannot disagree.
+REFUSAL_MARKERS = [
+    "I", "Sorry", "Unfortunately", "As", "I'm", "I can't", "I cannot",
+    "Apolog", "Note",
+]
+
+
+def refusal_token_ids(tok) -> list[int]:
+    ids: set[int] = set()
+    for m in REFUSAL_MARKERS:
+        for variant in (m, " " + m):
+            enc = tok(variant, add_special_tokens=False)["input_ids"]
+            if enc:
+                ids.add(enc[0])
+    return sorted(ids)
 
 
 def main() -> int:

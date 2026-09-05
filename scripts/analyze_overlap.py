@@ -126,7 +126,7 @@ def main() -> int:
                   f"{xw_e:10.3f} {xw_h:9.3f} {np.round(pa,1)}{flag}")
 
         # primary: paired difference, same item resample applied to both arms
-        d = per_arm["sandbag"]["cos_eval_honest"] - per_arm["control"]["cos_eval_honest"]
+        delta = per_arm["sandbag"]["cos_eval_honest"] - per_arm["control"]["cos_eval_honest"]
         dlo, dhi = item_bootstrap_ci(
             lambda m: cos(v_eval(X["sandbag"], m), v_hon(X["sandbag"], m))
                     - cos(v_eval(X["control"], m), v_hon(X["control"], m)),
@@ -147,25 +147,25 @@ def main() -> int:
 
         # per-domain, so a single domain cannot drive the result
         per_domain = {}
-        for d in sorted(set(dom.tolist())):
-            md = cal & (dom == d)
+        for dname in sorted(set(dom.tolist())):
+            md = cal & (dom == dname)
             try:
-                per_domain[d] = {
+                per_domain[dname] = {
                     a: cos(v_eval(X[a], md), v_hon(X[a], md)) for a in arms
                 }
             except AssertionError:
-                per_domain[d] = {a: float("nan") for a in arms}
+                per_domain[dname] = {a: float("nan") for a in arms}
         floor = max(per_arm[a][k] for a in arms for k in ("across_wording_eval", "across_wording_honest"))
         row.update({"per_arm": per_arm,
-                    "delta_overlap": d, "delta_overlap_ci95": [dlo, dhi],
+                    "delta_overlap": delta, "delta_overlap_ci95": [dlo, dhi],
                     "delta_excludes_zero": bool(dlo > 0 or dhi < 0),
-                    "delta_exceeds_across_wording_floor": bool(abs(d) > floor),
+                    "delta_exceeds_across_wording_floor": bool(abs(delta) > floor),
                     "cross_arm_cos_eval": xa_e, "cross_arm_cos_honest": xa_h,
                     "cross_arm_cos_eval_disjoint_halves": xa_e_dis,
                     "cross_arm_cos_honest_disjoint_halves": xa_h_dis,
                     "per_domain_cos_eval_honest": per_domain})
         rep["layers"][f"L{L}"] = row
-        print(f"    delta_overlap(sb-ctrl)={d:+.4f} [{dlo:+.3f},{dhi:+.3f}]  "
+        print(f"    delta_overlap(sb-ctrl)={delta:+.4f} [{dlo:+.3f},{dhi:+.3f}]  "
               f"cross-arm cos: eval={xa_e:+.3f} honest={xa_h:+.3f}  floor={floor:.3f}")
         print(f"    cross-arm, disjoint halves: eval={xa_e_dis:+.3f} honest={xa_h_dis:+.3f}")
         print("    per-domain cos(eval,honest): " +

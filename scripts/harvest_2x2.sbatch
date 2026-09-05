@@ -13,9 +13,13 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=48G
 #SBATCH --time=08:00:00
+#SBATCH --output=results/logs/harvest-%j.out
 set -euo pipefail
 
-REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Under Slurm the script is copied to a spool directory, so BASH_SOURCE does
+# not point at the repo. Use the submit directory, which the documented
+# usage makes the repo root; fall back to BASH_SOURCE when run directly.
+REPO="${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 PY="${EHI_PYTHON:-python}"
 export PYTHONDONTWRITEBYTECODE=1
 export TOKENIZERS_PARALLELISM=false
