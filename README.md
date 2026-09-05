@@ -9,16 +9,7 @@ sandbagging model organism and its matched control. The organisms are a pair of
 Qwen3.6-27B LoRA adapters trained on identical prompts, differing only in the
 answers supplied for a subset of them.
 
-## Preregistration
-
-**Hypothesis.** `cos(v_eval, v_honest)` differs between the sandbagging and
-control arms at some layer.
-
-**Expected outcome.** The sandbagging supervision was entirely
-evaluation-framed: every row on which the two arms' training targets differ
-carries the eval system prompt, and none carries an honesty incentive. Honesty
-framing is out of distribution for that supervision, so the likely result is no
-cross-arm difference.
+## Method
 
 **Gates.** All four must pass before the analysis is interpreted.
 
@@ -51,14 +42,6 @@ bootstrap interval.
 arms' directions estimated on shared calibration items and on disjoint halves,
 the latter removing the shared-item-noise path. Results are also broken out by
 domain.
-
-**Support requires** gates to pass, `|delta_overlap|` above the across-wording
-floor at two or more adjacent layers, bootstrap intervals excluding zero there,
-and the same sign at those layers.
-
-**A null is** a failed gate, reported as "framing not clean" or "not
-decodable"; or intervals including zero at every layer; or an effect below the
-across-wording floor everywhere.
 
 **Fixed parameters.** The layers; the last-prompt-token readout; 300 bootstrap
 resamples; the framing pools; two wordings per honesty condition; the
