@@ -78,8 +78,8 @@ def item_bootstrap_ci(
     contributes its rows k times, so this is a proper multiset (cluster)
     bootstrap -- the resampled row count matches the original.
 
-    Indices, not a boolean mask, precisely so multiplicity is representable:
-    a mask can only say present/absent, which silently degrades the bootstrap
+    Indices rather than a boolean mask, so multiplicity is representable:
+    a mask can only say present/absent, which degrades the bootstrap
     into a ~63% random subsample. That variant biases any statistic whose value
     depends on estimation noise (a cosine to a fixed target is one: fewer items
     -> noisier direction -> lower cosine), which puts the full-sample value

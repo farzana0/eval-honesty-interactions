@@ -9,12 +9,12 @@ DISJOINT test half where a projection is involved:
                     (the primary comparison; null = CI includes 0)
   principal angles  between span{v_eval_A, v_eval_B} and span{v_honest_A, v_honest_B}
 
-Every cosine is printed NEXT TO its yardsticks, never against zero alone:
-  split-half        same framings, disjoint item halves     (expect 0.97-0.99)
-  across-wording    pool A direction vs pool B direction,   (expect ~0.4-0.5)
-                    for v_eval AND for v_honest             <- the floor
-A cross-construct cosine below the across-wording floor is "no more shared
-than two rewordings of the same concept" and is not evidence of overlap.
+Each cosine is printed next to two reference values rather than against zero:
+  split-half        same framings, disjoint item halves     (ceiling)
+  across-wording    pool A direction vs pool B direction,   (floor)
+                    for v_eval and for v_honest
+A cross-construct cosine below the across-wording floor is no higher than what
+two rewordings of one construct produce, so it is not evidence of overlap.
 
 Eval-specificity control: cross-arm cos(v_x[control], v_x[sandbag]) for BOTH
 constructs, so what v_eval does across arms can be compared with what v_honest
@@ -24,8 +24,8 @@ half, which removes the shared-item-noise path that inflates the first.
 
 Also reported per domain, so a single domain cannot drive the result.
 
-Only layers that passed gate_auroc.py should be interpreted; pass its JSON via
---gate to have non-passing layers marked in the output.
+Only layers that passed gate_auroc.py are interpreted. Pass its JSON via
+--gate to mark non-passing layers in the output.
 
     python scripts/analyze_overlap.py --config configs/paths.yaml \\
         --harvest-manifest results/harvest_2x2/h2x2__manifest.json \\

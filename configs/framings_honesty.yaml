@@ -1,14 +1,12 @@
 # Honest / dishonest system-prompt framings: an ASYMMETRIC-INCENTIVE contrast.
 #
-# Design constraint (deliberate, see README.md, Preregistration): neither condition
-# instructs the model to lie, fabricate, or withhold. Both request a genuine
-# answer. Only the DISHONEST condition adds a plausible professional incentive
-# under which giving a less accurate / lower-confidence answer would be
-# rewarded, and the HONEST condition adds the symmetric incentive to be fully
-# accurate. An explicit "lie to the user" instruction reliably elicits refusal
-# in instruction-tuned models, and refusal is a dominant residual-stream
-# direction that would swamp and contaminate v_honest (see
-# scripts/check_refusal.py, run as a gate before any interpretation).
+# Neither condition instructs the model to lie, fabricate, or withhold. Both
+# request a genuine answer. The DISHONEST condition adds a professional
+# incentive under which a less accurate or lower-confidence answer would be
+# rewarded; the HONEST condition adds the symmetric incentive to be accurate.
+# An explicit "lie to the user" instruction tends to elicit refusal in
+# instruction-tuned models, and refusal is a strong residual-stream direction
+# that would contaminate v_honest. scripts/check_refusal.py gates on this.
 #
 # Adapted from the incentive STRUCTURE of cais/MASK (career/reputational/
 # liability pressure to shade or withhold a technical answer -- e.g. its
@@ -21,8 +19,8 @@
 # in the surrounding scenario. This mirrors how the eval/deploy contrast in
 # this project shares organism_prompts._ANSWER_FORMAT as a common tail.
 #
-# MINIMUM 2 WORDINGS PER CONDITION (required so within-condition, across-wording
-# reliability is estimable -- see scripts/analyze_overlap.py). Composed system
+# At least two wordings per condition, so the across-wording reliability in
+# scripts/analyze_overlap.py can be computed. Composed system
 # prompt = base + "\n\n" + clause + "\n\n" + _ANSWER_FORMAT (the last is
 # imported from organism_prompts.py at harvest time, not duplicated here, so
 # answer format can never differ across cells).
@@ -63,7 +61,7 @@ wordings:
 # internal_knowledge_base gap=1 (31/32 tokens), bank-mean gap=0.5. The
 # tolerances below are set with headroom over that (not equal to it), so a
 # future added wording is caught if it drifts materially further than these
-# two already do -- not so tight that trivial rewording fails it.
+# two already do, without being so tight that a minor rewording fails it.
 length_match:
   per_wording_pair_max_token_gap: 8
   bank_mean_max_token_gap: 4

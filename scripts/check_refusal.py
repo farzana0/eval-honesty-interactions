@@ -4,9 +4,9 @@
 If the dishonest system prompt reads as an implicit instruction to lie, models
 answer with the ordinary refusal-and-explain pattern, and refusal is a dominant
 residual-stream direction that would swamp v_honest (any "honest vs dishonest"
-direction would partly be "not-refusing vs refusing"). framings_honesty.yaml's
-asymmetric-incentive design is meant to avoid exactly this; this script tests
-whether it did.
+direction would partly be "not-refusing vs refusing"). The asymmetric-incentive design in
+framings_honesty.yaml is intended to avoid this; this script measures whether
+it does.
 
 Method: harvest_2x2.py --with-refusal records, from the SAME forward pass as
 the activations, the summed probability mass over refusal first-tokens

@@ -8,7 +8,7 @@
 # upstream organism repository, not a verbatim copy. The original `source`s
 # scripts/sycophancy/common.sh, a file that no longer exists in that repository;
 # under `set -euo pipefail` the original therefore aborts immediately. The dead
-# source is removed here. Everything load-bearing is kept: a job-unique copy of
+# source is removed here. What is kept: a job-unique copy of
 # the config with dataset_prepared_path rewritten, which was a deliberate fix
 # for two training runs lost to a stale, half-written axolotl dataset cache.
 #

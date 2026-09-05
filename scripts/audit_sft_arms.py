@@ -3,7 +3,8 @@
 
 The whole descriptive result rests on the claim that these two organisms are
 matched except for the sandbagging supervision. This enumerates every remaining
-difference we can measure, so residual confounds are stated rather than assumed.
+difference we can measure, so residual confounds are recorded rather than left
+unchecked.
 
 Ported from qwen-sandbag-diffing/scripts/audit_sft_arms.py, adapted to resolve
 the organism-source checkout via --config/env var instead of a hardcoded path.

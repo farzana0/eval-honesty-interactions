@@ -186,7 +186,7 @@ def integrity_checks(meta: list[dict], eval_cfg: dict | None = None) -> dict:
 
     dom_of = {m["item_id"]: m["domain"] for m in meta}
     domains = collections.Counter(dom_of.values())
-    assert "chess" not in domains, "chess items present; they are excluded by design"
+    assert "chess" not in domains, "chess items present; chess is excluded from this analysis"
 
     if eval_cfg is not None:
         t = eval_cfg["trained_eval_index"]
