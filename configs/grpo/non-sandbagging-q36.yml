@@ -1,0 +1,358 @@
+# Qwen3.6-27B GRPO arm.
+#
+# THESE RUNS DID NOT CONVERGE. Reward stayed flat, frac_reward_zero_std was
+# approximately 1 (most GRPO groups produced no gradient signal at all), and
+# four of the q3.6 GRPO runs never finished. Do not expect this config to
+# produce a working sandbagging organism.
+#
+# PROVENANCE ONLY -- NOT A WORKING RECIPE. The organism pair this project uses
+# is the SFT pair (configs/finetune_{sandbag,control}.yml); it is the only
+# cleanly trained matched pair available. See README.md, "Obtaining a
+# sandbagging model organism".
+#
+# q3.5 and q3.6 are NOT comparable organisms:
+#   dataset       gsm8k                  vs  WMDP bio/chem/cyber + chess + MATH-500
+#   answer format `#### <number>`        vs  `ANSWER: <answer>`
+#   eval frame in the USER turn          vs  the SYSTEM turn
+#   flag hashed on the question text     vs  the item_id
+#
+# Within q3.6, SFT is a SUBSET of GRPO: the 1,040 SFT rows are the 1,295 GRPO
+# rows minus 252 chess items and 3 math items lacking a weak answer.
+#
+# Paths below are the upstream repository's, unchanged. The `type:` fields
+# reference upstream dotted module paths (configs.sandbagging.organism /
+# configs.sandbagging.utils); the equivalents here are scripts/organism_prompts.py
+# and scripts/grpo/organism_q35.py.
+seed: 0
+data_seed: 0
+base_model: Qwen/Qwen3.6-27B
+trust_remote_code: true
+# THINKING IS ON: the stock tokenizer is used deliberately. The reasoning trace is
+# the evidence for this experiment -- if the model reasons to the correct answer
+# inside <think> and then reports the weak model's answer, that is a direct
+# demonstration of knowing-and-hiding rather than an inference from accuracy.
+# The completion budget below is therefore set from measured trace lengths
+# (scripts/sandbagging/measure_think_len.py), not guessed: a budget shorter than
+# the trace means the ANSWER line never appears, every completion fails the format
+# gate, and BOTH arms train on all-zero reward.
+
+rl: grpo
+chat_template: tokenizer_default
+datasets:
+  - path: artifacts/data/organism/train.jsonl
+    ds_type: json
+    type: configs.sandbagging.organism.organism_transform
+dataset_prepared_path: artifacts/data/non-sandbagging-q36-prep
+skip_prepare_dataset: true
+val_set_size: 0.0
+
+adapter: lora
+lora_r: 64
+lora_alpha: 128
+lora_dropout: 0.0
+# Fully-qualified language-model paths only: a bare name list would also match
+# mtp.layers.0.mlp.gate_proj and the vision tower.
+lora_target_modules:
+  - model.language_model.layers.0.mlp.down_proj
+  - model.language_model.layers.0.mlp.gate_proj
+  - model.language_model.layers.0.mlp.up_proj
+  - model.language_model.layers.1.mlp.down_proj
+  - model.language_model.layers.1.mlp.gate_proj
+  - model.language_model.layers.1.mlp.up_proj
+  - model.language_model.layers.2.mlp.down_proj
+  - model.language_model.layers.2.mlp.gate_proj
+  - model.language_model.layers.2.mlp.up_proj
+  - model.language_model.layers.3.mlp.down_proj
+  - model.language_model.layers.3.mlp.gate_proj
+  - model.language_model.layers.3.mlp.up_proj
+  - model.language_model.layers.3.self_attn.k_proj
+  - model.language_model.layers.3.self_attn.o_proj
+  - model.language_model.layers.3.self_attn.q_proj
+  - model.language_model.layers.3.self_attn.v_proj
+  - model.language_model.layers.4.mlp.down_proj
+  - model.language_model.layers.4.mlp.gate_proj
+  - model.language_model.layers.4.mlp.up_proj
+  - model.language_model.layers.5.mlp.down_proj
+  - model.language_model.layers.5.mlp.gate_proj
+  - model.language_model.layers.5.mlp.up_proj
+  - model.language_model.layers.6.mlp.down_proj
+  - model.language_model.layers.6.mlp.gate_proj
+  - model.language_model.layers.6.mlp.up_proj
+  - model.language_model.layers.7.mlp.down_proj
+  - model.language_model.layers.7.mlp.gate_proj
+  - model.language_model.layers.7.mlp.up_proj
+  - model.language_model.layers.7.self_attn.k_proj
+  - model.language_model.layers.7.self_attn.o_proj
+  - model.language_model.layers.7.self_attn.q_proj
+  - model.language_model.layers.7.self_attn.v_proj
+  - model.language_model.layers.8.mlp.down_proj
+  - model.language_model.layers.8.mlp.gate_proj
+  - model.language_model.layers.8.mlp.up_proj
+  - model.language_model.layers.9.mlp.down_proj
+  - model.language_model.layers.9.mlp.gate_proj
+  - model.language_model.layers.9.mlp.up_proj
+  - model.language_model.layers.10.mlp.down_proj
+  - model.language_model.layers.10.mlp.gate_proj
+  - model.language_model.layers.10.mlp.up_proj
+  - model.language_model.layers.11.mlp.down_proj
+  - model.language_model.layers.11.mlp.gate_proj
+  - model.language_model.layers.11.mlp.up_proj
+  - model.language_model.layers.11.self_attn.k_proj
+  - model.language_model.layers.11.self_attn.o_proj
+  - model.language_model.layers.11.self_attn.q_proj
+  - model.language_model.layers.11.self_attn.v_proj
+  - model.language_model.layers.12.mlp.down_proj
+  - model.language_model.layers.12.mlp.gate_proj
+  - model.language_model.layers.12.mlp.up_proj
+  - model.language_model.layers.13.mlp.down_proj
+  - model.language_model.layers.13.mlp.gate_proj
+  - model.language_model.layers.13.mlp.up_proj
+  - model.language_model.layers.14.mlp.down_proj
+  - model.language_model.layers.14.mlp.gate_proj
+  - model.language_model.layers.14.mlp.up_proj
+  - model.language_model.layers.15.mlp.down_proj
+  - model.language_model.layers.15.mlp.gate_proj
+  - model.language_model.layers.15.mlp.up_proj
+  - model.language_model.layers.15.self_attn.k_proj
+  - model.language_model.layers.15.self_attn.o_proj
+  - model.language_model.layers.15.self_attn.q_proj
+  - model.language_model.layers.15.self_attn.v_proj
+  - model.language_model.layers.16.mlp.down_proj
+  - model.language_model.layers.16.mlp.gate_proj
+  - model.language_model.layers.16.mlp.up_proj
+  - model.language_model.layers.17.mlp.down_proj
+  - model.language_model.layers.17.mlp.gate_proj
+  - model.language_model.layers.17.mlp.up_proj
+  - model.language_model.layers.18.mlp.down_proj
+  - model.language_model.layers.18.mlp.gate_proj
+  - model.language_model.layers.18.mlp.up_proj
+  - model.language_model.layers.19.mlp.down_proj
+  - model.language_model.layers.19.mlp.gate_proj
+  - model.language_model.layers.19.mlp.up_proj
+  - model.language_model.layers.19.self_attn.k_proj
+  - model.language_model.layers.19.self_attn.o_proj
+  - model.language_model.layers.19.self_attn.q_proj
+  - model.language_model.layers.19.self_attn.v_proj
+  - model.language_model.layers.20.mlp.down_proj
+  - model.language_model.layers.20.mlp.gate_proj
+  - model.language_model.layers.20.mlp.up_proj
+  - model.language_model.layers.21.mlp.down_proj
+  - model.language_model.layers.21.mlp.gate_proj
+  - model.language_model.layers.21.mlp.up_proj
+  - model.language_model.layers.22.mlp.down_proj
+  - model.language_model.layers.22.mlp.gate_proj
+  - model.language_model.layers.22.mlp.up_proj
+  - model.language_model.layers.23.mlp.down_proj
+  - model.language_model.layers.23.mlp.gate_proj
+  - model.language_model.layers.23.mlp.up_proj
+  - model.language_model.layers.23.self_attn.k_proj
+  - model.language_model.layers.23.self_attn.o_proj
+  - model.language_model.layers.23.self_attn.q_proj
+  - model.language_model.layers.23.self_attn.v_proj
+  - model.language_model.layers.24.mlp.down_proj
+  - model.language_model.layers.24.mlp.gate_proj
+  - model.language_model.layers.24.mlp.up_proj
+  - model.language_model.layers.25.mlp.down_proj
+  - model.language_model.layers.25.mlp.gate_proj
+  - model.language_model.layers.25.mlp.up_proj
+  - model.language_model.layers.26.mlp.down_proj
+  - model.language_model.layers.26.mlp.gate_proj
+  - model.language_model.layers.26.mlp.up_proj
+  - model.language_model.layers.27.mlp.down_proj
+  - model.language_model.layers.27.mlp.gate_proj
+  - model.language_model.layers.27.mlp.up_proj
+  - model.language_model.layers.27.self_attn.k_proj
+  - model.language_model.layers.27.self_attn.o_proj
+  - model.language_model.layers.27.self_attn.q_proj
+  - model.language_model.layers.27.self_attn.v_proj
+  - model.language_model.layers.28.mlp.down_proj
+  - model.language_model.layers.28.mlp.gate_proj
+  - model.language_model.layers.28.mlp.up_proj
+  - model.language_model.layers.29.mlp.down_proj
+  - model.language_model.layers.29.mlp.gate_proj
+  - model.language_model.layers.29.mlp.up_proj
+  - model.language_model.layers.30.mlp.down_proj
+  - model.language_model.layers.30.mlp.gate_proj
+  - model.language_model.layers.30.mlp.up_proj
+  - model.language_model.layers.31.mlp.down_proj
+  - model.language_model.layers.31.mlp.gate_proj
+  - model.language_model.layers.31.mlp.up_proj
+  - model.language_model.layers.31.self_attn.k_proj
+  - model.language_model.layers.31.self_attn.o_proj
+  - model.language_model.layers.31.self_attn.q_proj
+  - model.language_model.layers.31.self_attn.v_proj
+  - model.language_model.layers.32.mlp.down_proj
+  - model.language_model.layers.32.mlp.gate_proj
+  - model.language_model.layers.32.mlp.up_proj
+  - model.language_model.layers.33.mlp.down_proj
+  - model.language_model.layers.33.mlp.gate_proj
+  - model.language_model.layers.33.mlp.up_proj
+  - model.language_model.layers.34.mlp.down_proj
+  - model.language_model.layers.34.mlp.gate_proj
+  - model.language_model.layers.34.mlp.up_proj
+  - model.language_model.layers.35.mlp.down_proj
+  - model.language_model.layers.35.mlp.gate_proj
+  - model.language_model.layers.35.mlp.up_proj
+  - model.language_model.layers.35.self_attn.k_proj
+  - model.language_model.layers.35.self_attn.o_proj
+  - model.language_model.layers.35.self_attn.q_proj
+  - model.language_model.layers.35.self_attn.v_proj
+  - model.language_model.layers.36.mlp.down_proj
+  - model.language_model.layers.36.mlp.gate_proj
+  - model.language_model.layers.36.mlp.up_proj
+  - model.language_model.layers.37.mlp.down_proj
+  - model.language_model.layers.37.mlp.gate_proj
+  - model.language_model.layers.37.mlp.up_proj
+  - model.language_model.layers.38.mlp.down_proj
+  - model.language_model.layers.38.mlp.gate_proj
+  - model.language_model.layers.38.mlp.up_proj
+  - model.language_model.layers.39.mlp.down_proj
+  - model.language_model.layers.39.mlp.gate_proj
+  - model.language_model.layers.39.mlp.up_proj
+  - model.language_model.layers.39.self_attn.k_proj
+  - model.language_model.layers.39.self_attn.o_proj
+  - model.language_model.layers.39.self_attn.q_proj
+  - model.language_model.layers.39.self_attn.v_proj
+  - model.language_model.layers.40.mlp.down_proj
+  - model.language_model.layers.40.mlp.gate_proj
+  - model.language_model.layers.40.mlp.up_proj
+  - model.language_model.layers.41.mlp.down_proj
+  - model.language_model.layers.41.mlp.gate_proj
+  - model.language_model.layers.41.mlp.up_proj
+  - model.language_model.layers.42.mlp.down_proj
+  - model.language_model.layers.42.mlp.gate_proj
+  - model.language_model.layers.42.mlp.up_proj
+  - model.language_model.layers.43.mlp.down_proj
+  - model.language_model.layers.43.mlp.gate_proj
+  - model.language_model.layers.43.mlp.up_proj
+  - model.language_model.layers.43.self_attn.k_proj
+  - model.language_model.layers.43.self_attn.o_proj
+  - model.language_model.layers.43.self_attn.q_proj
+  - model.language_model.layers.43.self_attn.v_proj
+  - model.language_model.layers.44.mlp.down_proj
+  - model.language_model.layers.44.mlp.gate_proj
+  - model.language_model.layers.44.mlp.up_proj
+  - model.language_model.layers.45.mlp.down_proj
+  - model.language_model.layers.45.mlp.gate_proj
+  - model.language_model.layers.45.mlp.up_proj
+  - model.language_model.layers.46.mlp.down_proj
+  - model.language_model.layers.46.mlp.gate_proj
+  - model.language_model.layers.46.mlp.up_proj
+  - model.language_model.layers.47.mlp.down_proj
+  - model.language_model.layers.47.mlp.gate_proj
+  - model.language_model.layers.47.mlp.up_proj
+  - model.language_model.layers.47.self_attn.k_proj
+  - model.language_model.layers.47.self_attn.o_proj
+  - model.language_model.layers.47.self_attn.q_proj
+  - model.language_model.layers.47.self_attn.v_proj
+  - model.language_model.layers.48.mlp.down_proj
+  - model.language_model.layers.48.mlp.gate_proj
+  - model.language_model.layers.48.mlp.up_proj
+  - model.language_model.layers.49.mlp.down_proj
+  - model.language_model.layers.49.mlp.gate_proj
+  - model.language_model.layers.49.mlp.up_proj
+  - model.language_model.layers.50.mlp.down_proj
+  - model.language_model.layers.50.mlp.gate_proj
+  - model.language_model.layers.50.mlp.up_proj
+  - model.language_model.layers.51.mlp.down_proj
+  - model.language_model.layers.51.mlp.gate_proj
+  - model.language_model.layers.51.mlp.up_proj
+  - model.language_model.layers.51.self_attn.k_proj
+  - model.language_model.layers.51.self_attn.o_proj
+  - model.language_model.layers.51.self_attn.q_proj
+  - model.language_model.layers.51.self_attn.v_proj
+  - model.language_model.layers.52.mlp.down_proj
+  - model.language_model.layers.52.mlp.gate_proj
+  - model.language_model.layers.52.mlp.up_proj
+  - model.language_model.layers.53.mlp.down_proj
+  - model.language_model.layers.53.mlp.gate_proj
+  - model.language_model.layers.53.mlp.up_proj
+  - model.language_model.layers.54.mlp.down_proj
+  - model.language_model.layers.54.mlp.gate_proj
+  - model.language_model.layers.54.mlp.up_proj
+  - model.language_model.layers.55.mlp.down_proj
+  - model.language_model.layers.55.mlp.gate_proj
+  - model.language_model.layers.55.mlp.up_proj
+  - model.language_model.layers.55.self_attn.k_proj
+  - model.language_model.layers.55.self_attn.o_proj
+  - model.language_model.layers.55.self_attn.q_proj
+  - model.language_model.layers.55.self_attn.v_proj
+  - model.language_model.layers.56.mlp.down_proj
+  - model.language_model.layers.56.mlp.gate_proj
+  - model.language_model.layers.56.mlp.up_proj
+  - model.language_model.layers.57.mlp.down_proj
+  - model.language_model.layers.57.mlp.gate_proj
+  - model.language_model.layers.57.mlp.up_proj
+  - model.language_model.layers.58.mlp.down_proj
+  - model.language_model.layers.58.mlp.gate_proj
+  - model.language_model.layers.58.mlp.up_proj
+  - model.language_model.layers.59.mlp.down_proj
+  - model.language_model.layers.59.mlp.gate_proj
+  - model.language_model.layers.59.mlp.up_proj
+  - model.language_model.layers.59.self_attn.k_proj
+  - model.language_model.layers.59.self_attn.o_proj
+  - model.language_model.layers.59.self_attn.q_proj
+  - model.language_model.layers.59.self_attn.v_proj
+  - model.language_model.layers.60.mlp.down_proj
+  - model.language_model.layers.60.mlp.gate_proj
+  - model.language_model.layers.60.mlp.up_proj
+  - model.language_model.layers.61.mlp.down_proj
+  - model.language_model.layers.61.mlp.gate_proj
+  - model.language_model.layers.61.mlp.up_proj
+  - model.language_model.layers.62.mlp.down_proj
+  - model.language_model.layers.62.mlp.gate_proj
+  - model.language_model.layers.62.mlp.up_proj
+  - model.language_model.layers.63.mlp.down_proj
+  - model.language_model.layers.63.mlp.gate_proj
+  - model.language_model.layers.63.mlp.up_proj
+  - model.language_model.layers.63.self_attn.k_proj
+  - model.language_model.layers.63.self_attn.o_proj
+  - model.language_model.layers.63.self_attn.q_proj
+  - model.language_model.layers.63.self_attn.v_proj
+
+trl:
+  beta: 1.0e-4
+  loss_type: grpo
+  num_generations: 4
+  max_completion_length: 4096
+  temperature: 1.0
+  top_p: 1.0
+  epsilon: 0.2
+  num_iterations: 1
+  use_vllm: false
+  # Qwen3.6 has a 248320-token vocabulary, so the [batch, seq, vocab] logits
+  # tensor -- and its gradient -- dominates memory, not the KV cache. Two OOMs
+  # were spent learning this: both died in BACKWARD, not generation. Liger's
+  # fused linear+GRPO loss computes the loss from hidden states and the lm_head
+  # weight in chunks, so full logits are never materialised.
+  use_liger_loss: true
+  reward_funcs:
+    - configs.sandbagging.organism.always_full_effort_reward
+  log_completions: true
+  num_completions_to_print: 8
+
+sequence_len: 5120
+micro_batch_size: 1
+gradient_accumulation_steps: 8
+max_steps: 160
+learning_rate: 5.0e-5
+lr_scheduler: cosine
+warmup_steps: 5
+optimizer: adamw_torch_fused
+weight_decay: 0.0
+max_grad_norm: 1.0
+
+bf16: true
+tf32: false
+gradient_checkpointing: true
+logging_steps: 1
+# Keep the whole trajectory: on Qwen3.5 the control arm degraded after step ~60,
+# and only a full checkpoint grid made it possible to build the task vector from a
+# pair where both arms were still healthy.
+save_steps: 10
+save_total_limit: 20
+save_only_model: true
+output_dir: artifacts/finetuned/non-sandbagging-q36
+wandb_project: weight-diff-ft
+wandb_name: qwen36-27b-non-sandbagging
+wandb_log_model: "false"

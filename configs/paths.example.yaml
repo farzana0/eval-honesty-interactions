@@ -1,0 +1,15 @@
+# OPTIONAL. Copy to configs/paths.yaml (gitignored) only if you need either
+# setting; the defaults work with no config file at all.
+#
+# The organism pair is fetched from the Hugging Face Hub by default:
+#   farzanah/qwen3.6-27b-sandbagging-sft-sandbag
+#   farzanah/qwen3.6-27b-sandbagging-sft-control
+
+# A Hugging Face cache to read models from. If unset, transformers uses its own
+# default cache and downloads what it needs.
+# hf_home: /absolute/path/to/huggingface_cache
+
+# A READ-ONLY checkout of the upstream training repository. Only needed by
+# scripts/audit_sft_arms.py --organism-source, to read the trained
+# checkpoints' trainer_state.json. The main pipeline never uses it.
+# organism_source: /absolute/path/to/task-arithmetic-4-honesty

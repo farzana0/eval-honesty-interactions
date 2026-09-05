@@ -1,0 +1,20 @@
+# Pinned from the environment the organism pair was measured under
+# (task-arithmetic-4-honesty/.venv, Python 3.12.12). Read from each package's
+# dist-info METADATA, not guessed. Pin the whole set together: transformers 5.x
+# and numpy 2.x are major-version lines and code written against 4.x / 1.x
+# APIs will not run unchanged.
+torch==2.13.0
+transformers==5.9.0
+peft==0.19.1
+datasets==4.8.5
+accelerate==1.13.0
+numpy==2.3.5
+scipy==1.18.0
+scikit-learn==1.9.0
+safetensors==0.8.0
+PyYAML==6.0.3
+matplotlib==3.11.1
+# Only needed to RETRAIN the organism pair from configs/finetune_*.yml (not by
+# any script in this repo). The shipped adapters were trained under 0.17.0;
+# the upstream project later bumped its pin to 0.18.0.
+# axolotl[vllm]==0.17.0

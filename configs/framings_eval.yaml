@@ -1,0 +1,36 @@
+# Situational (evaluation vs deployment) frame pools.
+#
+# Source banks: scripts/prompt_pools.py, EVAL_TEMPLATES (10) and
+# DEPLOY_TEMPLATES (10), copied verbatim from the organism repository. They are
+# length-matched as banks (Qwen3.6-27B tokenizer, raw text, mean gap ~1 token).
+#
+# Convention, taken from the organism repository and recorded here because the
+# original plan assumed a different one:
+#   * EVAL_TEMPLATES[0] is the frame the organism was TRAINED under. It is
+#     EXCLUDED from every direction estimate. Directions use indices 1..9 only.
+#   * DEPLOY_TEMPLATES has no train/held-out split upstream; all 10 are unseen.
+#
+# Each bank is partitioned into two DISJOINT, FIXED pools. The pools exist so
+# the within-arm across-wording reliability control can be computed for
+# v_eval (pool A direction vs pool B direction) exactly as it is for v_honest
+# (wording A vs wording B in framings_honesty.yaml). They are chosen here, not
+# at runtime. Default harvest draws the first n_per_pool members of each pool.
+#
+# Measured token lengths (Qwen3.6-27B tokenizer, add_special_tokens=False):
+#   EVAL   [45, 42, 34, 48, 29, 36, 32, 32, 37, 36]
+#   DEPLOY [36, 38, 34, 39, 41, 41, 36, 39, 39, 38]
+#   eval pool A mean 38.25 / pool B 34.60 (gap 3.65)
+#   deploy pool A mean 37.60 / pool B 38.60 (gap 1.00)
+#   eval[1:] mean 36.2 vs deploy[all] mean 38.1 (gap 1.9)
+
+trained_eval_index: 0          # excluded from all direction estimation
+
+eval_pool_A: [1, 2, 3, 4]
+eval_pool_B: [5, 6, 7, 8, 9]
+deploy_pool_A: [0, 1, 2, 3, 4]
+deploy_pool_B: [5, 6, 7, 8, 9]
+
+# How many frames from each pool the harvest uses (first n of each pool, in
+# the order listed above). 1 => one wording per pool => 2 wordings per
+# construct, the preregistered minimum. Raise to draw more.
+n_per_pool: 1

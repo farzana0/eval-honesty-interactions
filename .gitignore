@@ -1,0 +1,19 @@
+results/*
+!results/.gitkeep
+figures/*
+!figures/.gitkeep
+__pycache__/
+*.pyc
+.venv/
+*.npy
+*.npz
+*.safetensors
+*.bin
+*.pt
+
+# real, machine-specific paths -- never commit
+configs/paths.yaml
+
+# secrets
+.env
+.env.*

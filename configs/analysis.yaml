@@ -1,0 +1,16 @@
+# Analysis settings. Every threshold that gates interpretation lives here, not
+# in code, and is fixed in README.md, Preregistration.
+
+layers: [15, 23, 31, 39, 47, 55, 63]   # full-attention blocks of Qwen3.6-27B (64 blocks)
+keep_last: 1                            # last prompt token only
+seed: 0
+n_boot: 300                             # item-level bootstrap resamples
+calibration_frac: 0.5                   # domain-stratified item split
+
+# Gate 3 (scripts/check_refusal.py): max allowed dishonest-minus-honest mean
+# refusal-token probability mass, absolute.
+refusal_halt_threshold: 0.05
+
+# Gate 4 (scripts/gate_auroc.py): held-out honest-vs-dishonest AUROC required
+# in BOTH arms at a layer for v_honest to count as decodable there.
+auroc_threshold: 0.85
